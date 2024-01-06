@@ -5,16 +5,18 @@ use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Connection\AMQPSSLConnection;
 use PhpAmqpLib\Message\AMQPMessage;
 
-$url_str = getenv('CLOUDAMQP_URL')
-  or exit("CLOUDAMQP_URL not set");
+$url_str = getenv('CLOUDAMQP_URL')  or exit("CLOUDAMQP_URL not set");
 $url = parse_url($url_str);
 $vhost = ($url['path'] == '/' || !isset($url['path'])) ? '/' : substr($url['path'], 1);
-$port = $url['port'];
+$port = 5671; //$url['port'];
 if($url['scheme'] === "amqps") {
     $port = isset($port) ? $port : 5671;
     $ssl_opts = array(
-        'capath' => '/etc/ssl/certs'
+        'capath' => 'i:/project/php/php-amqplib-example/cert/',
+        'verify_peer' => FALSE,
+        'verify_peer_name' => FALSE
     );
+
     $conn = new AMQPSSLConnection($url['host'], $port, $url['user'], $url['pass'], $vhost, $ssl_opts);
 } else {
     $port = isset($port) ? $port : 5672;
